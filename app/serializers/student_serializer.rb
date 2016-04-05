@@ -1,4 +1,5 @@
 class StudentSerializer < ActiveModel::Serializer
-  attributes :id, :name, :total_grade, :classroom, :comments
+  attributes :id, :name, :classroom, :comments
   has_one :user
+  has_many :assignments
 end
