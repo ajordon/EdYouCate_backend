@@ -20,7 +20,7 @@ class StudentsController < ApplicationController
   # POST /students
   # POST /students.json
   def create
-    @student = @classroom.student.new(student_params)
+    @student = @classroom.students.new(student_params)
 
     if @student.save
       render json: @student, status: :created, location: @student
@@ -32,7 +32,7 @@ class StudentsController < ApplicationController
   # PATCH/PUT /students/1
   # PATCH/PUT /students/1.json
   def update
-    @student = @classroom.student.find(params[:id])
+    @student = @classroom.students.find(params[:id])
 
     if @student.update(student_params)
       head :no_content
@@ -44,15 +44,15 @@ class StudentsController < ApplicationController
   # DELETE /students/1
   # DELETE /students/1.json
   def destroy
-    @student = @classroom.student.find(params[:id])
-    
+    @student = @classroom.students.find(params[:id])
+
     @student.destroy
     head :no_content
   end
 
   private
     def set_classroom
-      @classroom = classroom.find(params[:classroom_id])
+      @classroom = Classroom.find(params[:classroom_id])
     end
 
     def set_student

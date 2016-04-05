@@ -27,6 +27,7 @@ class AssignmentsController < ApplicationController
     # @students = set_students
     # @assignment = Assignment.new(assignment_params)
     @assignment = Classroom.assignements.new(assignment_params)
+    @assignment.user_id = current_user
     @students.assignements.new(assignment_params)
 
 
@@ -57,7 +58,7 @@ class AssignmentsController < ApplicationController
   # DELETE /assignments/1
   # DELETE /assignments/1.json
   def destroy
-    @assignment = @classroom.assignment.find(params[:id])
+    @assignment = @classroom.assignments.find(params[:id])
     @students_assignment = @students.assignments.find(params[:id])
 
     @students_assignment.destroy
@@ -67,7 +68,7 @@ class AssignmentsController < ApplicationController
 
   private
     def set_classroom
-      @classroom = classroom.find(params[:classroom_id])
+      @classroom = Classroom.find(params[:classroom_id])
     end
 
     def set_assignment
@@ -75,10 +76,10 @@ class AssignmentsController < ApplicationController
     end
 
     def set_students
-      @students = Classroom.students.find(params[:classroom_id])
+      @students = Student.find(params[:classroom_id])
     end
 
     def assignment_params
-      params.require(:assignment).permit(:title, :description, :comments, :grade, :due_date, :student)
+      params.require(:assignment).permit(:title, :description, :comments, :grade, :due_date, :student_id)
     end
 end
