@@ -4,7 +4,7 @@ class ClassroomsController < ProtectedController
   # GET /classrooms
   # GET /classrooms.json
   def index
-    @classrooms = current_user.classroom.all
+    @classrooms = current_user.classrooms.all
 
     render json: @classrooms
   end
@@ -62,6 +62,6 @@ class ClassroomsController < ProtectedController
     end
 
     def classroom_params
-      params.require(:classroom).permit(:name, :user)
+      params.require(:classroom).permit(:name)
     end
 end
