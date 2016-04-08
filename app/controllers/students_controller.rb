@@ -20,10 +20,11 @@ class StudentsController < ApplicationController
   # POST /students
   # POST /students.json
   def create
-    @student = @classroom.students.new(student_params)
+    @student = Student.new(student_params)
+    @student.classroom_id = @classroom.id
 
     if @student.save
-      render json: @student, status: :created, location: @student
+      render json: @student, status: :created
     else
       render json: @student.errors, status: :unprocessable_entity
     end

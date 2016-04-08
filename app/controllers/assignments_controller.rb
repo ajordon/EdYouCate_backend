@@ -1,5 +1,5 @@
 class AssignmentsController < ApplicationController
-  before_action :set_assignment, only: [:show, :update, :destroy]
+  # before_action :set_assignment, only: [:show, :update, :destroy]
   before_action :set_students, only: [:create, :update, :destroy]
   before_action :set_classroom
 
@@ -26,17 +26,26 @@ class AssignmentsController < ApplicationController
     ##Find all students for this classroom and give them the assignement
     # @students = set_students
     # @assignment = Assignment.new(assignment_params)
-    @assignment = Classroom.assignements.new(assignment_params)
-    @assignment.user_id = current_user
-    @students.assignements.new(assignment_params)
+    @assignment = Assignment.new(assignment_params)
+    @assignment.user = current_user
+    @assignment.classroom_id = @classroom.id
 
+    if @students.present?
+      @students.assignements.new(assignment_params)
 
-    if @assignment.save && @students.save
-      render json: @assignment, status: :created, location: @assignment
-      render json: @students, status: :created, location: @students
+      if @assignment.save && @students.save
+        render json: @assignment, status: :created
+        render json: @students, status: :created
+      else
+        render json: @assignment.errors, status: :unprocessable_entity
+        render json: @students.errors, status: :unprocessable_entity
+      end
     else
-      render json: @assignment.errors, status: :unprocessable_entity
-      render json: @students.errors, status: :unprocessable_entity
+      if @assignment.save
+        render json: @assignment, status: :created
+      else
+        render json: @assignment.errors, status: :unprocessable_entity
+      end
     end
   end
 
@@ -45,13 +54,22 @@ class AssignmentsController < ApplicationController
   def update
     ##Update the assignment for this user and the students in the classroom
     @assignment = @classroom.assignments.find(params[:id])
-    @students_assignment = @students.assignments.find(params[:id])
 
-    if @assignment.update(assignment_params) && @students_assignment.update(assignment_params)
-      head :no_content
+    if @students.present?
+      @students_assignment = @students.assignments.find(params[:id])
+
+      if @assignment.update(assignment_params) && @students_assignment.update(assignment_params)
+        head :no_content
+      else
+        render json: @assignment.errors, status: :unprocessable_entity
+        render json: @students.errors, status: :unprocessable_entity
+      end
     else
-      render json: @assignment.errors, status: :unprocessable_entity
-      render json: @students.errors, status: :unprocessable_entity
+      if @assignment.update(assignment_params)
+        head :no_content
+      else
+        render json: @assignment.errors, status: :unprocessable_entity
+      end
     end
   end
 
@@ -59,9 +77,12 @@ class AssignmentsController < ApplicationController
   # DELETE /assignments/1.json
   def destroy
     @assignment = @classroom.assignments.find(params[:id])
-    @students_assignment = @students.assignments.find(params[:id])
 
-    @students_assignment.destroy
+    if @students.present?
+      @students_assignment = @students.assignments.find(params[:id])
+      @students_assignment.destroy
+    end
+
     @assignment.destroy
     head :no_content
   end
@@ -72,14 +93,14 @@ class AssignmentsController < ApplicationController
     end
 
     def set_assignment
-      @assignment = Assignment.find(params[:id])
+      @assignment = Classroom.assignments.find(params[:id])
     end
 
     def set_students
-      @students = Student.find(params[:classroom_id])
+      @students = Classroom.find(params[:classroom_id]).students
     end
 
     def assignment_params
-      params.require(:assignment).permit(:title, :description, :comments, :grade, :due_date, :student_id)
+      params.require(:assignment).permit(:title, :description, :comments, :due_date)
     end
 end
