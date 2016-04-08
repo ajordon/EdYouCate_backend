@@ -1,6 +1,6 @@
 ### Ed-You-Cate
 
-
+[Link to frontend Repo](https://github.com/ajordon/EdYouCate_frontend)
 ### Authentication
 
 | Verb   | URI Pattern            | Controller#Action |
